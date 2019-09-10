@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "AzureWebJobsDashboard": "FILL WITH VALUES",
+    "AzureWebJobsStorage": "FILL WITH VALUES - SAME AS ABOVE",
+    "FUNCTIONS_EXTENSION_VERSION": "~2",
+    "WebSrvLogContainerName": "webserverlog",
+    "AzureWebJobsCosmos": "FILL WITH VALUES"
+  }
+}
