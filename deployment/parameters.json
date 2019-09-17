@@ -3,16 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "serverfarms_wslp_name": {
-            "value": null
+            "value": "socwslp"
         },
         "sites_wslpparserfn_name": {
-            "value": null
+            "value": "socwslpparserfn"
         },
         "storageAccounts_wslp_name": {
-            "value": null
+            "value": "socwslp"
         },
         "databaseAccounts_wslp_name": {
-            "value": null
+            "value": "socwslp"
+        },
+        "components_wslpparserfnai_name": {
+            "value": "socwslpparserfnai"
         }
     }
 }

@@ -17,6 +17,10 @@
         "databaseAccounts_wslp_name": {
             "defaultValue": "wslp",
             "type": "String"
+        },
+        "components_wslpparserfnai_name": {
+            "defaultValue": "wslpparserfnai",
+            "type": "String"
         }
     },
     "variables": {},
@@ -50,6 +54,21 @@
                     }
                 ],
                 "capabilities": []
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('components_wslpparserfnai_name')]",
+            "location": "westus2",
+            "tags": {
+                "hidden-link:/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/resourceGroups/websrvlogprocessor/providers/Microsoft.Web/sites/wslpparserfn": "Resource"
+            },
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Flow_Type": "Redfield",
+                "Request_Source": "AppServiceEnablementCreate"
             }
         },
         {
@@ -134,8 +153,8 @@
             },
             "kind": "functionapp",
             "identity": {
-                "principalId": "3df947da-b0f0-46ed-b916-cde0e094beca",
-                "tenantId": "cd718841-d840-4586-8601-bd1637cbc936",
+                "principalId": "",
+                "tenantId": "",
                 "type": "SystemAssigned"
             },
             "properties": {
