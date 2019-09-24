@@ -39,7 +39,7 @@ $containerResourceName = $cosmosAccountName + "/sql/" + $databaseName + "/" + $c
 ############################################################
 # Check if the Resource Group Exists
 ############################################################
-$existingRG = Get-AzResourceGroup -Name $resourceGroupName
+$existingRG = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if (($existingRG -ne $null) -and ($overwriteResources -ne $true)) {
 	Write-Host "Resource Group Already Exist.";
 	Write-Host "Provide a New Resource Group Name or set overwriteResources parameter to true.";
