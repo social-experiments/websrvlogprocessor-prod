@@ -1,0 +1,367 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "defaultValue": "wslp",
+            "type": "String"
+        },
+        "databaseAccountName": {
+            "defaultValue": "wslpdan",
+            "type": "String"
+        },
+        "location": {
+            "defaultValue": "West US 2",
+            "type": "String"
+        }
+	},
+    "variables": {
+		functionAppName: "[concat(parameters('resourceGroupName'), 'func')]",
+		hostingPlanName: "[concat(parameters('resourceGroupName'), 'asp')]",
+		applicationInsightsName: "[concat(parameters('resourceGroupName'), 'ai')]",
+		storageAccountName: "[concat(parameters('resourceGroupName'), 'san')]",
+		storageAccountid: "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+		databaseAccountid: "[concat(resourceGroup().id,'/providers/','Microsoft.DocumentDB/databaseAccounts/', parameters('databaseAccountName'))]",
+		connectionsOutlookName: "outlook",
+		connectionsAzureblobName: "azureblob",
+		workflows_socexp20la_name: "[concat(parameters('resourceGroupName'), 'la')]"
+	},
+    "resources": [
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2016-03-31",
+            "name": "[parameters('databaseAccountName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "defaultExperience": "Core (SQL)"
+            },
+            "kind": "GlobalDocumentDB",
+            "properties": {
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "locations": [
+                    {
+                        "locationName": "[parameters('location')]",
+                        "provisioningState": "Succeeded",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "capabilities": []
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default/processedjson')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default/webserverlog')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
+            "kind": "app",
+            "properties": {
+                "name": "[variables('hostingPlanName')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[variables('functionAppName')]",
+            "location": "[parameters('location')]",
+            "kind": "functionapp",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+              "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+              "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+              "siteConfig": {
+				"alwaysOn": true,
+                "appSettings": [
+                  {
+                    "name": "AzureWebJobsDashboard",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
+                  },
+                  {
+                    "name": "AzureWebJobsStorage",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
+                  },
+                  {
+                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                    "value": "~2"
+                  },
+                  {
+                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                    "value": "dotnet"
+                  },
+                  {
+                    "name": "WebSrvLogContainerName",
+                    "value": "processedjson"
+                  },
+                  {
+                    "name": "AzureWebJobsCosmos",
+                    "value": "[concat('AccountEndpoint=https://', parameters('databaseAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('databaseAccountid'),'2016-03-31').primaryMasterKey)]"
+                  }
+                ]
+              }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                      "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "https://github.com/social-experiments/websrvlogprocessor-prod.git",
+                        "branch": "master",
+                        "publishRunbook": true,
+                        "IsManualIntegration": true
+                    }
+               }
+            ]
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('connectionsAzureblobName')]",
+            "location": "westus2",
+            "properties": {
+                "displayName": "emailtrigger",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsAzureblobName'))]"
+                },
+                "parameterValues": {
+                    "accountName": "[variables('storageAccountName')]",
+                    "accessKey": "[listKeys(variables('storageAccountid'),'2015-05-01-preview').key1]"
+                }				
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('connectionsOutlookName')]",
+            "location": "westus2",
+            "properties": {
+                "displayName": "[concat('azfunction@', variables('connectionsOutlookName'), '.com')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsOutlookName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('workflows_socexp20la_name')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('connectionsAzureblobName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_a_new_email_arrives": {
+                            "recurrence": {
+                                "frequency": "Minute",
+                                "interval": 1
+                            },
+                            "splitOn": "@triggerBody()?['value']",
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['outlook']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/Mail/OnNewEmail",
+                                "queries": {
+                                    "fetchOnlyWithAttachment": true,
+                                    "folderPath": "Inbox",
+                                    "importance": "Any",
+                                    "includeAttachments": true
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "For_each": {
+                            "foreach": "@triggerBody()?['Attachments']",
+                            "actions": {
+                                "Create_blob": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": "@base64ToBinary(items('For_each')?['ContentBytes'])",
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/default/files",
+                                        "queries": {
+                                            "folderPath": "webserverlog",
+                                            "name": "@{triggerBody()?['From']}_@{triggerBody()?['DateTimeReceived']}",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Foreach"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureblob": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsAzureblobName'))]",
+                                "connectionName": "azureblob",
+                                "id": "/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/azureblob"
+                            },
+                            "outlook": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]",
+                                "connectionName": "outlook",
+                                "id": "/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/outlook"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

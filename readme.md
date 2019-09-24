@@ -74,10 +74,8 @@ Same as above. The hosting plan (App service plan) is different in this case. Th
 
 ## References:
 
-https://docs.microsoft.com/en-us/azure/logic-apps/
-<br>
-https://docs.microsoft.com/en-us/azure/connectors/connectors-create-api-outlook
-<br>
+### Azure Function Code Deployment:
+
 https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code
 <br>
 https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-function-app-create-dynamic/azuredeploy.json
@@ -85,3 +83,15 @@ https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-fu
 http://www.frankysnotes.com/2019/07/four-ways-to-deploy-your-azure-function.html
 <br>
 https://edi.wang/post/2019/8/10/create-azure-function-app-with-net-core-and-cd-from-github
+
+### Logic Apps:
+
+https://www.bruttin.com/2017/06/13/deploy-logic-app-with-arm.html
+<br>
+https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-azure-resource-manager-templates-overview
+<br>
+https://docs.microsoft.com/en-us/azure/logic-apps/
+<br>
+https://docs.microsoft.com/en-us/azure/connectors/connectors-create-api-outlook
+<br>
+https://vincentlauzon.com/2018/09/25/service-principal-for-logic-app-connector/
