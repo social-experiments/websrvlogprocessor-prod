@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.779
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parserlib", "parserlib\parserlib.csproj", "{D4B553BC-AA2C-4966-A962-606CB2447471}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parserfn", "parserfn\parserfn.csproj", "{B2A8AFA6-7B11-489E-BAF2-7947723755C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parserapp", "parserapp\parserapp.csproj", "{DC45E53E-4E10-4EEB-AC0C-45330F8D58CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parsertest", "parsertest\parsertest.csproj", "{C7FA2820-8051-4819-BEF8-D4A11B79A22C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parserfn", "parserfn\parserfn.csproj", "{B2A8AFA6-7B11-489E-BAF2-7947723755C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "parserlib", "parserlib\parserlib.csproj", "{D4B553BC-AA2C-4966-A962-606CB2447471}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
