@@ -93,7 +93,7 @@
                     },
                     {
                       "name": "FUNCTIONS_EXTENSION_VERSION",
-                      "value": "~1"
+                      "value": "~2"
                     },
                     {
                       "name": "FUNCTIONS_WORKER_RUNTIME",
