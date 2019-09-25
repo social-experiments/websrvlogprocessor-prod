@@ -2,14 +2,19 @@ param (
     [string]$resourceGroupName,
     [string]$location,
 	[string]$templateFile,
-	[bool]$overwriteResources = $false
+	[string]$subscriptionId,	
+	[bool]$overwriteResources = $false,
+	[string]$outlookAlias = "azfunction"
 )
 
 if (($resourceGroupName -eq "") -or ($location -eq "") -or ($templateFile -eq "")) {
-	Write-Host "Usage 1: deploy.ps1 resourceGroupName location templateFile";
-	Write-Host "Usage 2: deploy.ps1 resourceGroupName location templateFile overwriteResources";
-	Write-Host "Example 1: deploy.ps1 socexp 'West US 2' C:\template.json";
-	Write-Host "Example 2: deploy.ps1 socexp 'West US 2' C:\template.json true";
+	Write-Host "Usage 1: deploy.ps1 resourceGroupName location templateFile subscriptionId";
+	Write-Host "Usage 2: deploy.ps1 resourceGroupName location templateFile subscriptionId overwriteResources outlookAlias ";
+	Write-Host "Note 1: overwriteResources is a boolean value - allowed values $true / $false ";
+	Write-Host "Note 2: Outlook alias is the first part of outlook email id. For the outlook email id azfunction@outlook.com, the alias is azfunction ";
+	Write-Host "Note 3: The Outlook email is the one that is monitored for access logs ";
+	Write-Host "Example 1: deploy.ps1 socexp 'West US 2' C:\template.json 88888888-3333-2222-1111-000000000000 ";
+	Write-Host "Example 2: deploy.ps1 socexp 'West US 2' C:\template.json 88888888-3333-2222-1111-000000000000 true worldpossilbe";
 	Exit;
 }
 
@@ -58,6 +63,8 @@ $parameterObject = @{
 	"resourceGroupName" = $trimmedResourceGroupName
 	"databaseAccountName" = $cosmosAccountName
 	"location" = $location
+	"outlookAlias" = $outlookAlias
+	"subscriptionId" = $subscriptionId
 }
 
 ############################################################

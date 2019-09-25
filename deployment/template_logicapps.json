@@ -13,6 +13,14 @@
         "location": {
             "defaultValue": "West US 2",
             "type": "String"
+        },
+        "outlookAlias": {
+            "defaultValue": "azfunction",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "defaultValue": "",
+            "type": "String"
         }
 	},
     "variables": {
@@ -238,12 +246,12 @@
             "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
             "name": "[variables('connectionsAzureblobName')]",
-            "location": "westus2",
+            "location": "[parameters('location')]",
             "properties": {
                 "displayName": "emailtrigger",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsAzureblobName'))]"
+                    "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsAzureblobName'))]"
                 },
                 "parameterValues": {
                     "accountName": "[variables('storageAccountName')]",
@@ -255,12 +263,12 @@
             "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
             "name": "[variables('connectionsOutlookName')]",
-            "location": "westus2",
+            "location": "[parameters('location')]",
             "properties": {
-                "displayName": "[concat('azfunction@', variables('connectionsOutlookName'), '.com')]",
+                "displayName": "[concat(parameters('outlookAlias'), '@', variables('connectionsOutlookName'), '.com')]",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsOutlookName'))]"
+                    "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsOutlookName'))]"
                 }
             }
         },
@@ -268,7 +276,7 @@
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
             "name": "[variables('workflows_socexp20la_name')]",
-            "location": "westus2",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/connections', variables('connectionsAzureblobName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]"
@@ -350,12 +358,12 @@
                             "azureblob": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsAzureblobName'))]",
                                 "connectionName": "azureblob",
-                                "id": "/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/azureblob"
+                                "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsAzureblobName'))]"
                             },
                             "outlook": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]",
                                 "connectionName": "outlook",
-                                "id": "/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/outlook"
+								"id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsOutlookName'))]"
                             }
                         }
                     }
