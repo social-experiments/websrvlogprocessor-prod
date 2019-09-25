@@ -243,7 +243,7 @@
                 "displayName": "emailtrigger",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsAzureblobName'))]"
+                    "id": "[concat('/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsAzureblobName'))]"
                 },
                 "parameterValues": {
                     "accountName": "[variables('storageAccountName')]",
@@ -260,7 +260,7 @@
                 "displayName": "[concat('azfunction@', variables('connectionsOutlookName'), '.com')]",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsOutlookName'))]"
+                    "id": "[concat('/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/', variables('connectionsOutlookName'))]"
                 }
             }
         },
@@ -350,12 +350,12 @@
                             "azureblob": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsAzureblobName'))]",
                                 "connectionName": "azureblob",
-                                "id": "/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/azureblob"
+                                "id": "/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/azureblob"
                             },
                             "outlook": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]",
                                 "connectionName": "outlook",
-                                "id": "/subscriptions/6c41da6c-2ea2-4390-bb4f-a9c5c0573907/providers/Microsoft.Web/locations/westus2/managedApis/outlook"
+                                "id": "/subscriptions/subscription().id/providers/Microsoft.Web/locations/westus2/managedApis/outlook"
                             }
                         }
                     }
