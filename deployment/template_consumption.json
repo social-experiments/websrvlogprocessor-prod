@@ -13,6 +13,14 @@
         "location": {
             "defaultValue": "West US 2",
             "type": "String"
+        },
+        "outlookAlias": {
+            "defaultValue": "azfunction",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "defaultValue": "",
+            "type": "String"
         }
 	},
     "variables": {

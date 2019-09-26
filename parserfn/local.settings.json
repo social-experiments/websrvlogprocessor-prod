@@ -2,11 +2,10 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "AzureWebJobsDashboard": "",
-    "AzureWebJobsStorage": "",
+    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=worldpossiblewslpstor;AccountKey=xr24T7Yd3gry0t0pRpi8QeSqIpuppDq/AP8O26FLFAgFZxcV9MAtH1RnGfMovZh/vXU7Wguehv9Dw/A8odtwdA==;EndpointSuffix=core.windows.net",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=worldpossiblewslpstor;AccountKey=xr24T7Yd3gry0t0pRpi8QeSqIpuppDq/AP8O26FLFAgFZxcV9MAtH1RnGfMovZh/vXU7Wguehv9Dw/A8odtwdA==;EndpointSuffix=core.windows.net",
     "FUNCTIONS_EXTENSION_VERSION": "~2",
     "WebSrvLogContainerName": "processedjson",
-    "AzureWebJobsCosmos": "",
-    "APPINSIGHTS_INSTRUMENTATIONKEY": ""
+    "AzureWebJobsCosmos": "AccountEndpoint=https://worldpossiblewslpdb.documents.azure.com:443/;AccountKey=wNUWYFOaH7nrxurDmayHSp01kyeYNX1sRUxFVYkjyn2u3ufZPbt9fwFU606vqozzsnA4B5XmaCeoQ8AwlSfyRw==;"
   }
 }
