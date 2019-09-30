@@ -2,14 +2,17 @@ param (
 	[string]$subscriptionId,
     [string]$resourceGroupName,
     [string]$location,
-	[bool]$overwriteResources
+	[bool]$overwriteResources,
+	[string]$outlookAlias
 )
 
-$templateFile = template.json
+$templateFile = template_logicapps.json
 if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "")) {
-	Write-Host "Usage: deploy.ps1 subscriptionId resourceGroupName location overwriteResources ";
-	Write-Host "Note : overwriteResources is a boolean value - allowed values $true / $false ";
-	Write-Host "Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp 'West US 2' true";
+	Write-Host "Usage : deploy.ps1 subscriptionId resourceGroupName location overwriteResources outlookAlias ";
+	Write-Host "Note 1: overwriteResources is a boolean value - allowed values $true / $false ";
+	Write-Host "Note 2: Outlook alias is the first part of outlook email id. For the outlook email id triggerwslp@outlook.com, the alias is azfunction ";
+	Write-Host "Note 3: The Outlook email is the one that is monitored for access logs ";
+	Write-Host "Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp 'West US 2' true triggerwslp";
 	Exit;
 }
 
@@ -72,6 +75,8 @@ $parameterObject = @{
 	"resourceGroupName" = $trimmedResourceGroupName
 	"databaseAccountName" = $cosmosAccountName
 	"location" = $location
+	"outlookAlias" = $outlookAlias
+	"subscriptionId" = $subscriptionId
 }
 
 ############################################################

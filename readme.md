@@ -43,34 +43,61 @@ To validate the log parser, we the following resources to be created in an Azure
 
 Every user of this project, has to create these resources. Manually creating these entries is very tedious and error-prone. The deployment folder is an automation for resource deployment. There are scripts and template files that enables the automation
 
-#### login.ps1
+#### install.ps1
 
-The script has to be invoked with a Subscription ID.
 <br>
 <br>
-Usage: login.ps1 <subscriptionId>
+Usage: install.ps1 
 <br>
 <br>
-This powershell scripts installs and imports the AZ module, which has all the useful commandlets for resource deployment. After install and import, it prompts the user to login with his Azure Account. After login, the script will validate the input subscription ID. If this is a valid subscription ID, set the same as active subscription.
+This powershell scripts installs and imports the AZ module, which has all the useful commandlets for resource deployment. 
 <br>
 
 #### deploy.ps1
 
-Usage: deploy.ps1 <resourcegroupname> <location> <teplatename> <overwriteresources>
+Usage: deploy.ps1 <subscriptionid> <resourcegroupname> <location> <overwriteresources>
 <br>
 <br>
-Example: deploy.ps1 wslp1 "West US 2" template.json \$true
+Example: deploy.ps1 88888888-3333-2222-1111-000000000000 wslp1 "West US 2" \$true
 <br>
 <br>
-This powershell scripts, starts by creating the resource group, if it does not exist. Invokes the deployment process. The deployment process creates the database account, storage account, app service plan and then the azure function. After the resources are created, the azure function code deployment is configured, which pulls the source from github, builds and deploys the code. Once the deployment is complete, the script creates the database and collection within the database.
+This powershell script, prompts the user to login with his Azure Account. After login, the script will validate the input subscription ID. If this is a valid subscription ID, set the same as active subscription. Start to create the resource group, if it does not exist. Invokes the deployment process. The deployment process creates the database account, storage account, app service plan and then the azure function. After the resources are created, the azure function code deployment is configured, which pulls the source from github, builds and deploys the code. Once the deployment is complete, the script creates the database and collection within the database. This script automatically uses the template.json. The json file should be in the same directory as the script.
 
-#### template.json
+##### template.json
 
 This is the template file that encapsulates all the resources that has to be created for the end to end solution. This template creates an app service plan that would cost roughly 50 USD. There is also a azure function setting to allow always on. This results in instantaneous triggers for the azure function.
 
-#### template_consumption.json
+#### deploy_consumption.ps1
 
-Same as above. The hosting plan (App service plan) is different in this case. This aligns to the consumption plan which is cost effective. The function code, goes to sleep when not in use. The wake up on a trigger is not instananteous and we have seen a delay of 2-5 minute to wake up and start running the azure function.
+Usage: deploy_consumption.ps1 <subscriptionid> <resourcegroupname> <location> <overwriteresources>
+<br>
+<br>
+Example: deploy_consumption.ps1 88888888-3333-2222-1111-000000000000 wslp1 "West US 2" \$true
+<br>
+<br>
+This powershell script, prompts the user to login with his Azure Account. After login, the script will validate the input subscription ID. If this is a valid subscription ID, set the same as active subscription. Start to create the resource group, if it does not exist. Invokes the deployment process. The deployment process creates the database account, storage account, app service plan and then the azure function. After the resources are created, the azure function code deployment is configured, which pulls the source from github, builds and deploys the code. Once the deployment is complete, the script creates the database and collection within the database. This script automatically uses the template_consumption.json. The json file should be in the same directory as the script.
+
+##### template_consumption.json
+
+This is the template file that encapsulates all the resources that has to be created for the end to end solution. This template creates an app service plan that aligns with consumption plan. The function code, goes to sleep when not in use. The wake up on a trigger is not instananteous and we have seen a delay of 2-5 minute to wake up and start running the azure function.
+
+#### deploy_logicapps.ps1
+
+Usage: deploy.ps1 <subscriptionid> <resourcegroupname> <location> <overwriteresources> <outlookalias>
+<br>
+<br>
+Example: deploy_logicapps.ps1 88888888-3333-2222-1111-000000000000 wslp1 "West US 2" template.json \$true triggerwslp
+<br>
+<br>
+This powershell script, prompts the user to login with his Azure Account. After login, the script will validate the input subscription ID. If this is a valid subscription ID, set the same as active subscription. Start to create the resource group, if it does not exist. Invokes the deployment process. The deployment process creates the database account, storage account, app service plan and then the azure function. After the resources are created, the azure function code deployment is configured, which pulls the source from github, builds and deploys the code. Once the deployment is complete, the script creates the database and collection within the database. This script automatically uses the template_logicapps.json. The json file should be in the same directory as the script.
+<br>
+There is one manual step after the resource deployment.
+Go to Portal -> Navigate to Resource Group -> Click on Outlook API Connection -> Edit API Connection -> Click Authorize
+This will prompt to signin with the email that's configured to monitor for access log emails
+
+##### template_logicapps.json
+
+This is the template file that encapsulates all the resources that has to be created for the end to end solution. This template creates an app service plan that would cost roughly 50 USD. There is also a azure function setting to allow always on. This results in instantaneous triggers for the azure function. This template creates resouces for azure logic apps (2 connection objects - outlook and azure blob). The logic app resource wait for an email(with attachment) in the inbox. Once a mail arrives, processes the attachment and creates a blob with the attachment content.
 
 ## References:
 
