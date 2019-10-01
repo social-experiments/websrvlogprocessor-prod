@@ -210,7 +210,7 @@ namespace ParserLib
 
                 string[] moduleTokens = module.Split('/', '?');
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
-                if (moduleTokens.Length <= 2)
+                if (moduleTokens.Length <= 3)
                     continue;
 
                 //Specification says, the module url should start with "modules" - if that's not the case skip
