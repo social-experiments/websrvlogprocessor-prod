@@ -22,18 +22,17 @@
             "defaultValue": "",
             "type": "String"
         }
-	},
+    },
     "variables": {
-		functionAppName: "[concat(parameters('resourceGroupName'), 'func')]",
-		hostingPlanName: "[concat(parameters('resourceGroupName'), 'asp')]",
-		applicationInsightsName: "[concat(parameters('resourceGroupName'), 'ai')]",
-		storageAccountName: "[concat(parameters('resourceGroupName'), 'san')]",
-		storageAccountid: "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-		databaseAccountid: "[concat(resourceGroup().id,'/providers/','Microsoft.DocumentDB/databaseAccounts/', parameters('databaseAccountName'))]",
-		connectionsOutlookName: "outlook",
-		connectionsAzureblobName: "azureblob",
-		workflows_socexp20la_name: "[concat(parameters('resourceGroupName'), 'la')]"
-	},
+        "functionAppName": "[concat(parameters('resourceGroupName'), 'func')]",
+        "hostingPlanName": "[concat(parameters('resourceGroupName'), 'asp')]",
+        "storageAccountName": "[concat(parameters('resourceGroupName'), 'san')]",
+        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "databaseAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.DocumentDB/databaseAccounts/', parameters('databaseAccountName'))]",
+        "connectionsOutlookName": "outlook",
+        "connectionsAzureblobName": "azureblob",
+        "workflows_socexp20la_name": "[concat(parameters('resourceGroupName'), 'la')]"
+    },
     "resources": [
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
@@ -48,7 +47,8 @@
                 "enableAutomaticFailover": false,
                 "enableMultipleWriteLocations": false,
                 "isVirtualNetworkFilterEnabled": false,
-                "virtualNetworkRules": [],
+                "virtualNetworkRules": [
+                ],
                 "databaseAccountOfferType": "Standard",
                 "consistencyPolicy": {
                     "defaultConsistencyLevel": "Session",
@@ -63,7 +63,8 @@
                         "isZoneRedundant": false
                     }
                 ],
-                "capabilities": []
+                "capabilities": [
+                ]
             }
         },
         {
@@ -79,8 +80,10 @@
             "properties": {
                 "networkAcls": {
                     "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
+                    "virtualNetworkRules": [
+                    ],
+                    "ipRules": [
+                    ],
                     "defaultAction": "Allow"
                 },
                 "supportsHttpsTrafficOnly": true,
@@ -107,7 +110,8 @@
             ],
             "properties": {
                 "cors": {
-                    "corsRules": []
+                    "corsRules": [
+                    ]
                 },
                 "deleteRetentionPolicy": {
                     "enabled": false
@@ -190,40 +194,40 @@
             "location": "[parameters('location')]",
             "kind": "functionapp",
             "dependsOn": [
-              "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-              "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "properties": {
-              "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-              "siteConfig": {
-				"alwaysOn": true,
-                "appSettings": [
-                  {
-                    "name": "AzureWebJobsDashboard",
-                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
-                  },
-                  {
-                    "name": "AzureWebJobsStorage",
-                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
-                  },
-                  {
-                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                    "value": "~2"
-                  },
-                  {
-                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                    "value": "dotnet"
-                  },
-                  {
-                    "name": "WebSrvLogContainerName",
-                    "value": "processedjson"
-                  },
-                  {
-                    "name": "AzureWebJobsCosmos",
-                    "value": "[concat('AccountEndpoint=https://', parameters('databaseAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('databaseAccountid'),'2016-03-31').primaryMasterKey)]"
-                  }
-                ]
-              }
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "WebSrvLogContainerName",
+                            "value": "processedjson"
+                        },
+                        {
+                            "name": "AzureWebJobsCosmos",
+                            "value": "[concat('AccountEndpoint=https://', parameters('databaseAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('databaseAccountid'),'2016-03-31').primaryMasterKey)]"
+                        }
+                    ]
+                }
             },
             "resources": [
                 {
@@ -231,7 +235,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                      "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
+                        "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "https://github.com/social-experiments/websrvlogprocessor-prod.git",
@@ -239,7 +243,7 @@
                         "publishRunbook": true,
                         "IsManualIntegration": true
                     }
-               }
+                }
             ]
         },
         {
@@ -249,14 +253,15 @@
             "location": "[parameters('location')]",
             "properties": {
                 "displayName": "emailtrigger",
-                "customParameterValues": {},
+                "customParameterValues": {
+                },
                 "api": {
                     "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsAzureblobName'))]"
                 },
                 "parameterValues": {
                     "accountName": "[variables('storageAccountName')]",
                     "accessKey": "[listKeys(variables('storageAccountid'),'2015-05-01-preview').key1]"
-                }				
+                }
             }
         },
         {
@@ -266,7 +271,8 @@
             "location": "[parameters('location')]",
             "properties": {
                 "displayName": "[concat(parameters('outlookAlias'), '@', variables('connectionsOutlookName'), '.com')]",
-                "customParameterValues": {},
+                "customParameterValues": {
+                },
                 "api": {
                     "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsOutlookName'))]"
                 }
@@ -288,7 +294,8 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "$connections": {
-                            "defaultValue": {},
+                            "defaultValue": {
+                            },
                             "type": "Object"
                         }
                     },
@@ -322,7 +329,8 @@
                             "foreach": "@triggerBody()?['Attachments']",
                             "actions": {
                                 "Create_blob": {
-                                    "runAfter": {},
+                                    "runAfter": {
+                                    },
                                     "type": "ApiConnection",
                                     "inputs": {
                                         "body": "@base64ToBinary(items('For_each')?['ContentBytes'])",
@@ -346,11 +354,13 @@
                                     }
                                 }
                             },
-                            "runAfter": {},
+                            "runAfter": {
+                            },
                             "type": "Foreach"
                         }
                     },
-                    "outputs": {}
+                    "outputs": {
+                    }
                 },
                 "parameters": {
                     "$connections": {
@@ -363,7 +373,7 @@
                             "outlook": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('connectionsOutlookName'))]",
                                 "connectionName": "outlook",
-								"id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsOutlookName'))]"
+                                "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/', variables('connectionsOutlookName'))]"
                             }
                         }
                     }
@@ -371,5 +381,6 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+    }
 }
