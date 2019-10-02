@@ -4,6 +4,11 @@
 
 Linux Webservers like nginx and Apache creates a log entry for every resource that is accessed from the WebServer. The log file is typically named as "access.log". Access Log has rich access information that can produce great insight for the content owner. He can derive useful informations like module access count, popular modules, etc.
 
+### Log File Location for NGINX:
+
+/var/log/nginx/access.log
+
+<br>
 This project takes access log as input. It parses the access log and produce module statistics. The statistics information is persisted in a Cosmos Database. A power BI module project this information into a nice graphical view.
 
 ## Project Structure

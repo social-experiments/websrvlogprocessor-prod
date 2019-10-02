@@ -8,8 +8,8 @@ param (
 $templateFile = template_consumption.json
 if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "")) {
 	Write-Host "Usage: deploy.ps1 subscriptionId resourceGroupName location overwriteResources ";
-	Write-Host "Note : overwriteResources is a boolean value - allowed values $true / $false ";
-	Write-Host "Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp 'West US 2' true";
+	Write-Host "Note : overwriteResources is a boolean value - allowed values $true/$false ";
+	Write-Host "Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp 'West US 2' $true";
 	Exit;
 }
 
