@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\parserlib\parserlib.csproj" />
+    <ProjectReference Include="..\parserlib\ParserLib.csproj" />
   </ItemGroup>
 
 </Project>

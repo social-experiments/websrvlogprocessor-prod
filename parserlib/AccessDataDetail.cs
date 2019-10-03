@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace parserlib
+namespace ParserLib
 {
     //AccessDataDetail Object to be serialized into JSON - One per day
     public class AccessDataDetail

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace parserlib
+namespace ParserLib
 {
     //Represents a record in Access Log
     public class AccessData

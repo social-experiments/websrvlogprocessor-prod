@@ -8,7 +8,7 @@ using ParserLib;
 using Microsoft.Azure.Documents;
 using System.Collections.Generic;
 
-namespace parserfn
+namespace ParserFn
 {
     // Cosmos DB Entity
    

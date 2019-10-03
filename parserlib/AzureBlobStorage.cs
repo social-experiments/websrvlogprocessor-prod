@@ -10,7 +10,7 @@ using Microsoft.Azure.Storage.Blob;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
-namespace parserlib
+namespace ParserLib
 {
     //Utility Class to Upload to Blob
     public class AzureBlobStorage : IStorage

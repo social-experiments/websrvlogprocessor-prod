@@ -10,7 +10,7 @@ using Microsoft.Azure.Storage.Blob;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
-namespace parserlib
+namespace ParserLib
 {
     public class LogParser
     {

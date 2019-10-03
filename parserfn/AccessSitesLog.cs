@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace parserfn
+namespace ParserFn
 {
     public class AccessedSitesLog
     {

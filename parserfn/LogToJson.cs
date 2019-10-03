@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using ParserLib;
 
-namespace parserfn
+namespace ParserFn
 {
     public static class LogToJson
     {
