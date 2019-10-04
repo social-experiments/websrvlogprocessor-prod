@@ -6,8 +6,8 @@ param (
 	[string]$outlookAlias
 )
 
-$templateFile = template_logicapps.json
-if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "")) {
+$templateFile = "template_logicapps.json"
+if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "") -or ($outlookAlias -eq "")) {
 	Write-Host "Usage : deploy.ps1 subscriptionId resourceGroupName location overwriteResources outlookAlias ";
 	Write-Host "Note 1: overwriteResources is a boolean value - allowed values $true/$false ";
 	Write-Host "Note 2: Outlook alias is the first part of outlook email id. For the outlook email id triggerwslp@outlook.com, the alias is azfunction ";
