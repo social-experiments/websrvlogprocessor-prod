@@ -122,6 +122,8 @@ namespace ParserLib
         {
             string deviceId = GetDeviceId(blobName);
 
+            long bandwidth = 0l;
+
             IList<string> result = new List<string>();
             string lineEntry = string.Empty;
 
@@ -145,9 +147,9 @@ namespace ParserLib
                 if (regexResult.Count == 0)
                     continue;
 
-                //Ignore Token 2(token[1]) & Token 3(token[2]) - Irrelevant
+                //Ignore token[1] & token[2] - Irrelevant
 
-                //Token 4(token[3]) - Date information
+                //token[3] - Date information
                 string dateValue = tokens[3].Substring(1);
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 DateTime dtObj = DateTime.ParseExact(dateValue, "dd/MMM/yyyy:HH:mm:ss", provider);
@@ -155,10 +157,15 @@ namespace ParserLib
                 //TODO return if date is not valid
                 string formattedDateValue = dtObj.ToString("yyyyMMdd");
 
-                //Ignore Token 5(token[4]) & Token 6(token[5]) - Irrelevant
+                //Ignore token[4] & token[5] - Irrelevant
 
-                //Token 7(token[6]) Contains Module Information.
+                //token[6] - Contains Module Information.
                 string module = tokens[6];
+
+                //token[7] and token[8] are not used for now
+
+                //token[9] - Contains bandwidth info
+                bandwidth += Convert.ToInt64(tokens[9]);
 
                 string[] moduleTokens = module.Split('/', '?');
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
@@ -255,6 +262,7 @@ namespace ParserLib
                 AccessDataDetail addObj = new AccessDataDetail();
                 addObj.AccessDate = dateValue;
                 addObj.DeviceId = deviceId;
+                addObj.Bandwidth = bandwidth;
 
                 if (dateRangeList.ContainsKey(dateValue))
                 {

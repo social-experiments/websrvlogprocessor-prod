@@ -11,6 +11,7 @@ namespace ParserLib
         public string AccessDate { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public long Bandwidth { get; set; }
         public List<AccessData> AccessDetails { get; set; } = new List<AccessData>();
     }
 }
