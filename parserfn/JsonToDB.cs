@@ -46,13 +46,23 @@ namespace ParserFn
                     Url = accessedsite.ModuleName,
                     Date = accessedsite.UpLoadTime.ToString("MM/dd/yyyy"),
                     MainModuleCount = accessedsite.MainModuleCount,
-                    SubModuleCount = accessedsite.SubModuleCount
+                    SubModuleCount = accessedsite.SubModuleCount,
+                    Bandwidth = accessedsite.Bandwidth
                 };
 
                 // upload accessedSiteRecord to cosmos db
                 cosmosOutput.Add(accessedSiteRecord);
                 log.LogInformation($"Added all to  Cosmos DB");
             }
+
+            // Add general information
+            var summary = new AccessLogSummary
+            {
+                DeviceId = result.DeviceId,
+                AccessDate = result.AccessDate,
+                Bandwidth = result.Bandwidth
+            };
+            // cosmosOutput.Add(summary);
         }
     }
 }

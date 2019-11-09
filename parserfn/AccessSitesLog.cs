@@ -10,6 +10,7 @@ namespace ParserFn
         public string PartitionKey { get; set; }
         public string Date { get; set; }
         public string Url { get; set; }
+        public long Bandwidth { get; set; }
         public long MainModuleCount { get; set; }
         public long SubModuleCount { get; set; }
     }
