@@ -224,7 +224,7 @@ namespace ParserLib
                     continue;
 
                 //Ignore all the request that came for the same time - An html page has css, js, and lot of references - they dont count towards an article that was read - round off to 1 event for 1 second.
-                    if (prevRecord == dtObj)
+                if (prevRecord == dtObj)
                     continue;
                 else
                     prevRecord = dtObj;
@@ -237,11 +237,12 @@ namespace ParserLib
                 }
                 else
                 {
-                    //If there exist a record, update only the end time.
+                    //If there exist a record, update only the end time as we process each record
                     DateRange rangeObj = dateRangeList[formattedDateValue];
                     rangeObj.EndTime = DateTime.Parse(dtObj.ToString("HH:mm:ss"));
                 }
 
+                //If there are no records for the current date - check from cloud or local and load it
                 if (!existingRecords.ContainsKey(formattedDateValue))
                 {
                     //Check if there is a JSON for this date - if exist load the JSON in memory
@@ -256,6 +257,7 @@ namespace ParserLib
                     }
                 }
 
+                //If there are records for current date - check if there is an overlap in time and ignore
                 if (existingRecords[formattedDateValue] != null)
                 {
                     DateTime startTime = existingRecords[formattedDateValue].StartTime;
@@ -297,6 +299,7 @@ namespace ParserLib
 
             }
 
+            //In the loop above - we just skip the overlapping record. Here is where the merge happens
             //Iterate AccessDataDetails for each date
             foreach (string dateValue in accessDataList.Keys)
             {
@@ -304,12 +307,14 @@ namespace ParserLib
                 addObj.AccessDate = dateValue;
                 addObj.DeviceId = deviceId;
 
+                //Add the Start and End Date we derived from processing the current log
                 if (dateRangeList.ContainsKey(dateValue))
                 {
                     addObj.StartTime = dateRangeList[dateValue].StartTime;
                     addObj.EndTime = dateRangeList[dateValue].EndTime;
                 }
 
+                //Add the Unmerged record from processing the current log
                 IDictionary<string, AccessData> dictionaryObj = accessDataList[dateValue];
                 foreach (string moduleName in dictionaryObj.Keys)
                 {
