@@ -8,8 +8,8 @@ namespace Application
     {
         static void Main(string[] args)
         {
-            //try
-            //{
+            try
+            {
                 string connectionString = "";
                 string containerName = "";
 
@@ -24,11 +24,11 @@ namespace Application
                 streamObj = File.Open(fileName, FileMode.Open);
                 result = parObj.Parse("worldpossible@outlook.com_2019-09-03T00:40:26 00:00", streamObj);
                 parObj.Upload(result);
-            //}
-            //catch(Exception)
-            //{
-            //    Console.WriteLine("Exception in Main");
-            //}
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("Exception in Main");
+            }
         }
     }
 }
