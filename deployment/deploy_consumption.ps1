@@ -5,7 +5,7 @@ param (
 	[bool]$overwriteResources
 )
 
-$templateFile = template_consumption.json
+$templateFile = "template_consumption.json"
 if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "")) {
 	Write-Host "Usage: deploy.ps1 subscriptionId resourceGroupName location overwriteResources ";
 	Write-Host "Note : overwriteResources is a boolean value - allowed values $true/$false ";
