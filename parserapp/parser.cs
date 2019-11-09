@@ -13,14 +13,14 @@ namespace Application
                 string connectionString = "";
                 string containerName = "";
 
-                LogParser parObj = new LogParser(connectionString, containerName, true);
+                LogParser parObj = new LogParser(connectionString, containerName, false, "I:\\Scratch\\");
                 string fileName = @"access4.log";
                 var streamObj = File.Open(fileName, FileMode.Open);
                 var result = parObj.Parse("worldpossible@outlook.com_2019-09-03T00:40:26 00:00", streamObj);
                 parObj.Upload(result);
 
                 fileName = @"access5.log";
-                parObj = new LogParser(connectionString, containerName, true);
+                parObj = new LogParser(connectionString, containerName, false, "I:\\Scratch\\");
                 streamObj = File.Open(fileName, FileMode.Open);
                 result = parObj.Parse("worldpossible@outlook.com_2019-09-03T00:40:26 00:00", streamObj);
                 parObj.Upload(result);
