@@ -118,11 +118,37 @@ namespace ParserLib
             }
         }
 
+        // Updates a bandwidth record for the given module
+        // Returns true if this module was already in the dictionary,
+        // Returns false otherwise
+        private void IncrementModuleBandwidth(IDictionary<string, long> bandwidths, string module, long bandwidth)
+        {
+            if (!bandwidths.TryGetValue(module, out long current)) {
+                bandwidths.Add(module, bandwidth);
+            } else
+            {
+                bandwidths[module] = current + bandwidth;
+            }
+        }
+
+        private void IncrementModuleBandwidth(IDictionary<string, IDictionary<string, long>> bandwidths, string date, string module, long bandwidth)
+        {
+            if (!bandwidths.TryGetValue(date, out IDictionary<string, long> dateBandwidths))
+            {
+                dateBandwidths = new Dictionary<string, long>();
+                bandwidths.Add(date, dateBandwidths);
+            }
+            IncrementModuleBandwidth(dateBandwidths, module, bandwidth);
+        }
+
         public IList<string> Parse(string blobName, Stream accessLogBlob)
         {
             string deviceId = GetDeviceId(blobName);
 
-            long bandwidth = 0l;
+            // Using another object that does its work before the skip logic. This should be refactored at some point.
+            IDictionary<string, IDictionary<string, long>> bandwidths = new Dictionary<string, IDictionary<string, long>>();  // any way to approximate final size to reduce rehashes?
+
+            long totalBandwidth = 0L;
 
             IList<string> result = new List<string>();
             string lineEntry = string.Empty;
@@ -165,12 +191,19 @@ namespace ParserLib
                 //token[7] and token[8] are not used for now
 
                 //token[9] - Contains bandwidth info
-                bandwidth += Convert.ToInt64(tokens[9]);
+                long bandwidth = Convert.ToInt64(tokens[9]);
 
                 string[] moduleTokens = module.Split('/', '?');
+
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
                 if (moduleTokens.Length <= 2)
                     continue;
+
+                // Handle bandwidth before we skip
+                // Cleans hour:minute:second from the datetime string
+                IncrementModuleBandwidth(bandwidths, formattedDateValue, moduleTokens[2], bandwidth);
+                Console.WriteLine("{0} {1}", moduleTokens[2], bandwidth);
+                totalBandwidth += bandwidth;
 
                 //Specification says, the module url should start with "modules" - if that's not the case skip
                 if (!moduleTokens.Contains("modules"))
@@ -262,7 +295,7 @@ namespace ParserLib
                 AccessDataDetail addObj = new AccessDataDetail();
                 addObj.AccessDate = dateValue;
                 addObj.DeviceId = deviceId;
-                addObj.Bandwidth = bandwidth;
+                addObj.Bandwidth = totalBandwidth;
 
                 if (dateRangeList.ContainsKey(dateValue))
                 {
@@ -273,10 +306,13 @@ namespace ParserLib
                 IDictionary<string, AccessData> dictionaryObj = accessDataList[dateValue];
                 foreach (string moduleName in dictionaryObj.Keys)
                 {
-                    addObj.AccessDetails.Add(dictionaryObj[moduleName]);
+                    var next = dictionaryObj[moduleName];
+                    next.Bandwidth = (bandwidths[dateValue])[moduleName];
+                    addObj.AccessDetails.Add(next);
+                    Console.WriteLine(moduleName);
                 }
 
-                //Merge existing record with current record
+                // Merge existing record with current record
                 if (existingRecords.ContainsKey(dateValue))
                 {
                     if (existingRecords[dateValue] != null)
@@ -339,7 +375,6 @@ namespace ParserLib
                     return null;
                 }
             }
-
             return result;
         }
 
