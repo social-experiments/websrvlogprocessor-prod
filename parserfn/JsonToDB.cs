@@ -56,10 +56,10 @@ namespace ParserFn
             }
 
             // Add general information
-            var summary = new AccessLogSummary
+            var summary = new AccessedSitesLog
             {
-                DeviceId = result.DeviceId,
-                AccessDate = result.AccessDate,
+                MainModuleCount = 0,
+                SubModuleCount = 0,
                 Bandwidth = result.Bandwidth
             };
             // cosmosOutput.Add(summary);
