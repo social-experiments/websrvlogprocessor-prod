@@ -51,9 +51,6 @@ namespace ParserLib
         public string AccessDate { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-
-        //TODO<HACK-FOR-GOOD>: Add a field to calculate the Bandwidth
-
         public List<AccessData> AccessDetails { get; set; } = new List<AccessData>();
     }
 
@@ -186,10 +183,8 @@ namespace ParserLib
                 bool isMainModule = false;
 
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
-                if (tokens.Length <= 6) //TODO<HACK-FOR-GOOD>: Look for at least 10 Tokens - 10th is the Size(Array Index 9)
+                if (tokens.Length <= 6)
                     continue;
-
-                //TODO<HACK-FOR-GOOD> - Calculate the Running total of total MB Recorded in this Window
 
                 //If the first token (token[0]) is not of type IP address - skip processing - evaluate via Regex
                 string clientIP = tokens[0];
