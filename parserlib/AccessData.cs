@@ -11,5 +11,6 @@ namespace ParserLib
         public long MainModuleCount { get; set; }
         public long SubModuleCount { get; set; }
         public DateTime UpLoadTime { get; set; }
+        public long Bandwidth { get; set; }
     }
 }

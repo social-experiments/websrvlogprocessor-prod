@@ -122,7 +122,7 @@ namespace ParserLib
         {
             string deviceId = GetDeviceId(blobName);
 
-            long bandwidth = 0l;
+            long bandwidth = 0L;
 
             IList<string> result = new List<string>();
             string lineEntry = string.Empty;
@@ -165,13 +165,14 @@ namespace ParserLib
                 //token[7] and token[8] are not used for now
 
                 //token[9] - Contains bandwidth info
-                bandwidth += Convert.ToInt64(tokens[9]);
+                long moduleBandwidth = Convert.ToInt64(tokens[9]);
+                bandwidth += moduleBandwidth;
 
                 string[] moduleTokens = module.Split('/', '?');
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
                 if (moduleTokens.Length <= 2)
                     continue;
-
+                    
                 //Specification says, the module url should start with "modules" - if that's not the case skip
                 if (!moduleTokens.Contains("modules"))
                     continue;
@@ -244,8 +245,12 @@ namespace ParserLib
                 if (!dictionaryObj.ContainsKey(moduleName))
                 {
                     //Add new value object (AccessData) for each record in access log
-                    AccessData obj = new AccessData() { ModuleName = moduleName, MainModuleCount = 0, SubModuleCount = 0, UpLoadTime = dtObj };
+                    AccessData obj = new AccessData() { ModuleName = moduleName, MainModuleCount = 0, SubModuleCount = 0, UpLoadTime = dtObj, Bandwidth = moduleBandwidth};
                     dictionaryObj.Add(moduleName, obj);
+                } 
+                else
+                {
+                    dictionaryObj[moduleName].Bandwidth += moduleBandwidth;
                 }
 
                 AccessData accessDataObj = dictionaryObj[moduleName];
