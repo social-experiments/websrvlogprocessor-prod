@@ -34,7 +34,7 @@ namespace ParserFn
                     result = serializer.Deserialize<AccessDataDetail>(jsonTextReader);
                 }
             }
-
+            
             //For each AccessData Object in the list - create a record in Cosmos DB
             foreach (AccessData accessedsite in result.AccessDetails)
             {
@@ -58,9 +58,11 @@ namespace ParserFn
             // Add general information
             var summary = new AccessedSitesLog
             {
+                PartitionKey = result.DeviceId + " " +  result.AccessDate,
                 id = "TotalBandwidth",
                 MainModuleCount = -1,
                 SubModuleCount = -1,
+                Date = result.AccessDate,
                 Bandwidth = result.Bandwidth
             };
             cosmosOutput.Add(summary);
