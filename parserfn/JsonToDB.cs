@@ -58,8 +58,9 @@ namespace ParserFn
             // Add general information
             var summary = new AccessedSitesLog
             {
-                MainModuleCount = 0,
-                SubModuleCount = 0,
+                id = "TotalBandwidth",
+                MainModuleCount = -1,
+                SubModuleCount = -1,
                 Bandwidth = result.Bandwidth
             };
             // cosmosOutput.Add(summary);
