@@ -63,7 +63,7 @@ namespace ParserFn
                 SubModuleCount = -1,
                 Bandwidth = result.Bandwidth
             };
-            // cosmosOutput.Add(summary);
+            cosmosOutput.Add(summary);
         }
     }
 }
