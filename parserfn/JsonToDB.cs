@@ -58,8 +58,9 @@ namespace ParserFn
             // Add general information
             var summary = new AccessedSitesLog
             {
-                PartitionKey = result.DeviceId + " " +  result.AccessDate,
+                PartitionKey = result.DeviceId + " " + result.AccessDate,
                 id = result.DeviceId + " TotalBandwidth",
+                Url = string.Empty,
                 MainModuleCount = -1,
                 SubModuleCount = -1,
                 Date = result.AccessDate,
