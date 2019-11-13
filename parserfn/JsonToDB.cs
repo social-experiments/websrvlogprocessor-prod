@@ -60,7 +60,7 @@ namespace ParserFn
             {
                 PartitionKey = result.DeviceId + " " + result.AccessDate,
                 id = result.DeviceId + " TotalBandwidth",
-                Url = string.Empty,
+                Url = "/dev/null",
                 MainModuleCount = -1,
                 SubModuleCount = -1,
                 Date = result.AccessDate,
