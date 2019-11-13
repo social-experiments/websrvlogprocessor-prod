@@ -63,7 +63,7 @@ namespace ParserFn
                 Url = "/dev/null",
                 MainModuleCount = -1,
                 SubModuleCount = -1,
-                Date = result.AccessDate,
+                Date = result.AccessDetails[0].UpLoadTime.ToString("MM/dd/yyy"), // should be same date anyways and forces using the correct format. Assumes at least one module was counted
                 Bandwidth = result.Bandwidth
             };
             cosmosOutput.Add(summary);
