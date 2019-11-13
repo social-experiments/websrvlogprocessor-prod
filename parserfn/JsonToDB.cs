@@ -60,7 +60,7 @@ namespace ParserFn
             {
                 PartitionKey = result.DeviceId + " " + result.AccessDate,
                 id = result.DeviceId + " TotalBandwidth",
-                Url = "/dev/null",
+                Url = "Total Bandwidth",
                 MainModuleCount = -1,
                 SubModuleCount = -1,
                 Date = result.AccessDetails[0].UpLoadTime.ToString("MM/dd/yyy"), // should be same date anyways and forces using the correct format. Assumes at least one module was counted
