@@ -141,6 +141,59 @@ namespace ParserLib
             IncrementModuleBandwidth(dateBandwidths, module, bandwidth);
         }
 
+        private LineDataDetail ExtractLineData(string lineEntry)
+        {
+            LineDataDetail info = new LineDataDetail();
+
+            try
+            {
+                dynamic line = JsonConvert.DeserializeObject(lineEntry);
+                info.ClientIP = line.remote_addr;
+                info.Date = line.time_local.Substring(0, line.time_local.Length - 6);
+                info.Module = line.request;
+                info.Bandwidth = Convert.ToInt64(line.body_bytes_sent);
+                info.LineType = "json";
+                info.Skip = false;
+            }
+            catch (JsonReaderException e)
+            {
+                string[] tokens = lineEntry.Split(' ');
+
+                info.ClientIP = string.Empty;
+                info.Date = string.Empty;
+                info.Module = string.Empty;
+                info.LineType = "tokenized";
+                info.Bandwidth = 0;
+
+                //If the first token (token[0]) is not of type IP address - skip processing - evaluate via Regex
+                Regex ipRegex = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
+                MatchCollection regexResult = ipRegex.Matches(tokens[0]);
+
+                if (regexResult.Count == 0 || tokens.Length <= 6)
+                {
+                    //this line would be skipped anyway so no data is recorded because the line is probably broken
+                    info.Skip = true;
+                }
+                else
+                {
+                    //token[0] - ip address
+                    info.ClientIP = tokens[0];
+                    //Ignore token[1] & token[2] - Irrelevant
+                    //token[3] - Date information
+                    info.Date = tokens[3].Substring(1, tokens[3].Length - 7);
+                    //Ignore token[4] & token[5] - Irrelevant
+                    //token[6] - Contains Module Information.
+                    info.Module = tokens[6];
+                    //token[7] and token[8] are not used for now
+                    //token[9] - Contains bandwidth info
+                    info.Bandwidth = Convert.ToInt64(tokens[9]);
+                    info.Skip = false;
+                }                    
+            }
+
+            return info;
+        }
+
         public IList<string> Parse(string blobName, Stream accessLogBlob)
         {
             string deviceId = GetDeviceId(blobName);
@@ -156,48 +209,52 @@ namespace ParserLib
             //Initialize the prev record to some random date
             DateTime prevRecord = DateTime.Parse("01/01/1900");
 
+            string prevLineType = string.Empty;
+
             var file = new StreamReader(accessLogBlob);
             while ((lineEntry = file.ReadLine()) != null)
             {
-                string[] tokens = lineEntry.Split(' ');
+                LineDataDetail lineInfo = ExtractLineData(lineEntry);
+
+                //skip the next line if the next line is not of the same type as the previous type
+                //deciding type is the type of the very first line
+                //this assumes that the group of the lines of different type contain the same data so they can just be skipped without losing data
+                if (!prevLineType.Equals(string.Empty)) 
+                {
+                    if (!lineInfo.LineType.Equals(prevLineType))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    prevLineType = lineInfo.LineType;
+                }
+
+                if (lineInfo.Skip)
+                {
+                    continue;
+                }
+
                 bool isMainModule = false;
-
-                //TODO: We skip this for now - need to check if this is an error and log appropriately
-                if (tokens.Length <= 6)
-                    continue;
-
-                //If the first token (token[0]) is not of type IP address - skip processing - evaluate via Regex
-                string clientIP = tokens[0];
-                Regex ipRegex = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
-                MatchCollection regexResult = ipRegex.Matches(clientIP);
-                if (regexResult.Count == 0)
-                    continue;
-
-                //Ignore token[1] & token[2] - Irrelevant
-
-                //token[3] - Date information
-                string dateValue = tokens[3].Substring(1);
+                
+                string dateValue = lineInfo.Date;
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 DateTime dtObj = DateTime.ParseExact(dateValue, "dd/MMM/yyyy:HH:mm:ss", provider);
 
                 //TODO return if date is not valid
                 string formattedDateValue = dtObj.ToString("yyyyMMdd");
 
-                //Ignore token[4] & token[5] - Irrelevant
-
-                //token[6] - Contains Module Information.
-                string module = tokens[6];
-
-                //token[7] and token[8] are not used for now
-
-                //token[9] - Contains bandwidth info
-                long bandwidth = Convert.ToInt64(tokens[9]);
+                string module = lineInfo.Module;
+                
+                long bandwidth = lineInfo.Bandwidth;
 
                 string[] moduleTokens = module.Split('/', '?');
 
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
                 if (moduleTokens.Length <= 2)
-                    continue;
+                    //continue;
+                    throw new Exception();
 
                 // Handle bandwidth before we skip
                 // Cleans hour:minute:second from the datetime string
@@ -255,6 +312,7 @@ namespace ParserLib
 
                     DateTime currrentTime = DateTime.Parse(dtObj.ToString("HH:mm:ss"));
 
+                    //TODO: need to ignore module count but still add to bandwidth count here
                     //If the current log entry is a overlapping with existing record - ignore
                     if (currrentTime >= startTime && currrentTime <= endTime)
                         continue;
