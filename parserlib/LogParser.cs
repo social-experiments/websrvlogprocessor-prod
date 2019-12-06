@@ -149,13 +149,14 @@ namespace ParserLib
             {
                 dynamic line = JsonConvert.DeserializeObject(lineEntry);
                 info.ClientIP = line.remote_addr;
-                info.Date = line.time_local.Substring(0, line.time_local.Length - 6);
+                //info.Date = line.time_local.Substring(0, line.time_local.Length - 6);
+                info.Date = ((string)line.time_local).Substring(0, ((string)line.time_local).Length - 6);
                 info.Module = line.request;
                 info.Bandwidth = Convert.ToInt64(line.body_bytes_sent);
                 info.LineType = "json";
                 info.Skip = false;
             }
-            catch (JsonReaderException e)
+            catch (JsonReaderException)
             {
                 string[] tokens = lineEntry.Split(' ');
 
@@ -236,8 +237,6 @@ namespace ParserLib
                     continue;
                 }
 
-                bool isMainModule = false;
-                
                 string dateValue = lineInfo.Date;
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 DateTime dtObj = DateTime.ParseExact(dateValue, "dd/MMM/yyyy:HH:mm:ss", provider);
@@ -253,8 +252,10 @@ namespace ParserLib
 
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
                 if (moduleTokens.Length <= 2)
+                {
                     //continue;
                     throw new Exception();
+                }
 
                 // Handle bandwidth before we skip
                 // Cleans hour:minute:second from the datetime string
@@ -264,13 +265,17 @@ namespace ParserLib
 
                 //Specification says, the module url should start with "modules" - if that's not the case skip
                 if (!moduleTokens.Contains("modules"))
+                {
                     continue;
+                }
 
                 //Ignore all the Image based URLs
                 if (moduleTokens[moduleTokens.Length - 1].Contains(".png") || moduleTokens[moduleTokens.Length - 1].Contains(".jpg") ||
                         moduleTokens[moduleTokens.Length - 1].Contains(".bmp") || moduleTokens[moduleTokens.Length - 1].Contains(".gif") ||
                         moduleTokens[moduleTokens.Length - 1].Contains(".js") || moduleTokens[moduleTokens.Length - 1].Contains(".css"))
+                {
                     continue;
+                }
 
                 //Ignore all the request that came for the same time - An html page has css, js, and lot of references - they dont count towards an article that was read - round off to 1 event for 1 second.
                 if (prevRecord == dtObj)
@@ -315,12 +320,13 @@ namespace ParserLib
                     //TODO: need to ignore module count but still add to bandwidth count here
                     //If the current log entry is a overlapping with existing record - ignore
                     if (currrentTime >= startTime && currrentTime <= endTime)
+                    {
+                        //it seems that total bandwidth is still being added to totalBandwidth at this point
+                        //because of continue, the module count below is not executed but the bandwidth count before the continue is still executed
+                        //so far, it seems nothing needs to be done for this TODO
                         continue;
+                    }
                 }
-
-                //Check if the request is for Main Module
-                if (moduleTokens[3].Contains(".htm") || moduleTokens[3].Contains("html"))
-                    isMainModule = true;
 
                 if (!accessDataList.ContainsKey(formattedDateValue))
                 {
@@ -340,10 +346,15 @@ namespace ParserLib
                 }
 
                 AccessData accessDataObj = dictionaryObj[moduleName];
-                if (isMainModule)
-                    accessDataObj.MainModuleCount = accessDataObj.MainModuleCount + 1;
+                //Check if the request is for Main Module
+                if (moduleTokens[3].Contains(".htm") || moduleTokens[3].Contains("html"))
+                {
+                    accessDataObj.MainModuleCount += 1;
+                }
                 else
-                    accessDataObj.SubModuleCount = accessDataObj.SubModuleCount + 1;
+                {
+                    accessDataObj.SubModuleCount += 1;
+                }
 
             }
 
