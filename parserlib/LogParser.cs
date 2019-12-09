@@ -181,7 +181,7 @@ namespace ParserLib
                     info.ClientIP = tokens[0];
                     //Ignore token[1] & token[2] - Irrelevant
                     //token[3] - Date information
-                    info.Date = tokens[3].Substring(1, tokens[3].Length - 7);
+                    info.Date = tokens[3].Substring(1, 20);
                     //Ignore token[4] & token[5] - Irrelevant
                     //token[6] - Contains Module Information.
                     info.Module = tokens[6];
