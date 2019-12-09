@@ -141,6 +141,60 @@ namespace ParserLib
             IncrementModuleBandwidth(dateBandwidths, module, bandwidth);
         }
 
+        private LineDataDetail ExtractLineData(string lineEntry)
+        {
+            LineDataDetail info = new LineDataDetail();
+
+            try
+            {
+                dynamic line = JsonConvert.DeserializeObject(lineEntry);
+                info.ClientIP = line.remote_addr;
+                //info.Date = line.time_local.Substring(0, line.time_local.Length - 6);
+                info.Date = ((string)line.time_local).Substring(0, ((string)line.time_local).Length - 6);
+                info.Module = line.request;
+                info.Bandwidth = Convert.ToInt64(line.body_bytes_sent);
+                info.LineType = "json";
+                info.Skip = false;
+            }
+            catch (JsonReaderException)
+            {
+                string[] tokens = lineEntry.Split(' ');
+
+                info.ClientIP = string.Empty;
+                info.Date = string.Empty;
+                info.Module = string.Empty;
+                info.LineType = "tokenized";
+                info.Bandwidth = 0;
+
+                //If the first token (token[0]) is not of type IP address - skip processing - evaluate via Regex
+                Regex ipRegex = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
+                MatchCollection regexResult = ipRegex.Matches(tokens[0]);
+
+                if (regexResult.Count == 0 || tokens.Length <= 6)
+                {
+                    //this line would be skipped anyway so no data is recorded because the line is probably broken
+                    info.Skip = true;
+                }
+                else
+                {
+                    //token[0] - ip address
+                    info.ClientIP = tokens[0];
+                    //Ignore token[1] & token[2] - Irrelevant
+                    //token[3] - Date information
+                    info.Date = tokens[3].Substring(1, 20);
+                    //Ignore token[4] & token[5] - Irrelevant
+                    //token[6] - Contains Module Information.
+                    info.Module = tokens[6];
+                    //token[7] and token[8] are not used for now
+                    //token[9] - Contains bandwidth info
+                    info.Bandwidth = Convert.ToInt64(tokens[9]);
+                    info.Skip = false;
+                }                    
+            }
+
+            return info;
+        }
+
         public IList<string> Parse(string blobName, Stream accessLogBlob)
         {
             string deviceId = GetDeviceId(blobName);
@@ -156,48 +210,52 @@ namespace ParserLib
             //Initialize the prev record to some random date
             DateTime prevRecord = DateTime.Parse("01/01/1900");
 
+            string prevLineType = string.Empty;
+
             var file = new StreamReader(accessLogBlob);
             while ((lineEntry = file.ReadLine()) != null)
             {
-                string[] tokens = lineEntry.Split(' ');
-                bool isMainModule = false;
+                LineDataDetail lineInfo = ExtractLineData(lineEntry);
 
-                //TODO: We skip this for now - need to check if this is an error and log appropriately
-                if (tokens.Length <= 6)
+                //skip the next line if the next line is not of the same type as the previous type
+                //deciding type is the type of the very first line
+                //this assumes that the group of the lines of different type contain the same data so they can just be skipped without losing data
+                if (!prevLineType.Equals(string.Empty)) 
+                {
+                    if (!lineInfo.LineType.Equals(prevLineType))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    prevLineType = lineInfo.LineType;
+                }
+
+                if (lineInfo.Skip)
+                {
                     continue;
+                }
 
-                //If the first token (token[0]) is not of type IP address - skip processing - evaluate via Regex
-                string clientIP = tokens[0];
-                Regex ipRegex = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
-                MatchCollection regexResult = ipRegex.Matches(clientIP);
-                if (regexResult.Count == 0)
-                    continue;
-
-                //Ignore token[1] & token[2] - Irrelevant
-
-                //token[3] - Date information
-                string dateValue = tokens[3].Substring(1);
+                string dateValue = lineInfo.Date;
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 DateTime dtObj = DateTime.ParseExact(dateValue, "dd/MMM/yyyy:HH:mm:ss", provider);
 
                 //TODO return if date is not valid
                 string formattedDateValue = dtObj.ToString("yyyyMMdd");
 
-                //Ignore token[4] & token[5] - Irrelevant
-
-                //token[6] - Contains Module Information.
-                string module = tokens[6];
-
-                //token[7] and token[8] are not used for now
-
-                //token[9] - Contains bandwidth info
-                long bandwidth = Convert.ToInt64(tokens[9]);
+                string module = lineInfo.Module;
+                
+                long bandwidth = lineInfo.Bandwidth;
 
                 string[] moduleTokens = module.Split('/', '?');
 
                 //TODO: We skip this for now - need to check if this is an error and log appropriately
                 if (moduleTokens.Length <= 2)
-                    continue;
+                {
+                    //continue;
+                    throw new Exception();
+                }
 
                 // Handle bandwidth before we skip
                 // Cleans hour:minute:second from the datetime string
@@ -207,13 +265,17 @@ namespace ParserLib
 
                 //Specification says, the module url should start with "modules" - if that's not the case skip
                 if (!moduleTokens.Contains("modules"))
+                {
                     continue;
+                }
 
                 //Ignore all the Image based URLs
                 if (moduleTokens[moduleTokens.Length - 1].Contains(".png") || moduleTokens[moduleTokens.Length - 1].Contains(".jpg") ||
                         moduleTokens[moduleTokens.Length - 1].Contains(".bmp") || moduleTokens[moduleTokens.Length - 1].Contains(".gif") ||
                         moduleTokens[moduleTokens.Length - 1].Contains(".js") || moduleTokens[moduleTokens.Length - 1].Contains(".css"))
+                {
                     continue;
+                }
 
                 //Ignore all the request that came for the same time - An html page has css, js, and lot of references - they dont count towards an article that was read - round off to 1 event for 1 second.
                 if (prevRecord == dtObj)
@@ -255,14 +317,16 @@ namespace ParserLib
 
                     DateTime currrentTime = DateTime.Parse(dtObj.ToString("HH:mm:ss"));
 
+                    //TODO: need to ignore module count but still add to bandwidth count here
                     //If the current log entry is a overlapping with existing record - ignore
                     if (currrentTime >= startTime && currrentTime <= endTime)
+                    {
+                        //it seems that total bandwidth is still being added to totalBandwidth at this point
+                        //because of continue, the module count below is not executed but the bandwidth count before the continue is still executed
+                        //so far, it seems nothing needs to be done for this TODO
                         continue;
+                    }
                 }
-
-                //Check if the request is for Main Module
-                if (moduleTokens[3].Contains(".htm") || moduleTokens[3].Contains("html"))
-                    isMainModule = true;
 
                 if (!accessDataList.ContainsKey(formattedDateValue))
                 {
@@ -282,10 +346,15 @@ namespace ParserLib
                 }
 
                 AccessData accessDataObj = dictionaryObj[moduleName];
-                if (isMainModule)
-                    accessDataObj.MainModuleCount = accessDataObj.MainModuleCount + 1;
+                //Check if the request is for Main Module
+                if (moduleTokens[3].Contains(".htm") || moduleTokens[3].Contains("html"))
+                {
+                    accessDataObj.MainModuleCount += 1;
+                }
                 else
-                    accessDataObj.SubModuleCount = accessDataObj.SubModuleCount + 1;
+                {
+                    accessDataObj.SubModuleCount += 1;
+                }
 
             }
 
