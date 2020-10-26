@@ -224,7 +224,7 @@
                     ],
                     "properties": {
                         "RepoUrl": "https://github.com/social-experiments/websrvlogprocessor-prod.git",
-                        "branch": "master",
+                        "branch": "sarsoma/dotnet_upgrade",
                         "publishRunbook": true,
                         "IsManualIntegration": true
                     }
