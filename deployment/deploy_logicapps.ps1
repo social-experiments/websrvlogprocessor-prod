@@ -8,11 +8,11 @@ param (
 
 $templateFile = "template_logicapps.json"
 if (($resourceGroupName -eq "") -or ($location -eq "") -or ($subscriptionId -eq "") -or ($outlookAlias -eq "")) {
-	Write-Host "Usage : deploy.ps1 subscriptionId resourceGroupName location overwriteResources outlookAlias ";
-	Write-Host "Note 1: overwriteResources is a boolean value - allowed values $true/$false ";
-	Write-Host "Note 2: Outlook alias is the first part of outlook email id. For the outlook email id triggerwslp@outlook.com, the alias is azfunction ";
-	Write-Host "Note 3: The Outlook email is the one that is monitored for access logs ";
-	Write-Host "Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp 'West US 2' $true triggerwslp";
+	Write-Host 'Usage : deploy.ps1 subscriptionId resourceGroupName location overwriteResources outlookAlias ';
+	Write-Host 'Note 1: overwriteResources is a boolean value - allowed values $true/$false ';
+	Write-Host 'Note 2: Outlook alias is the first part of outlook email id. For the outlook email id triggerwslp@outlook.com, the alias is azfunction ';
+	Write-Host 'Note 3: The Outlook email is the one that is monitored for access logs ';
+	Write-Host 'Example: deploy.ps1 88888888-3333-2222-1111-000000000000 socexp "West US 2" $true triggerwslp';
 	Exit;
 }
 
@@ -33,7 +33,7 @@ if ($context -eq $null) {
 	Exit;
 }
 
-Set-AzContext $context  
+Set-AzContext $context
 Write-Host "Successfully Set Active Subscription to $subscriptionId";
 
 ############################################################
@@ -83,7 +83,7 @@ $parameterObject = @{
 # Create a Deployment
 ############################################################
 Write-Host "Deploying Resources.";
-$deployment = New-AzResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -TemplateFile $templateFile -TemplateParameterObject $parameterObject                                         
+$deployment = New-AzResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroupName -TemplateFile $templateFile -TemplateParameterObject $parameterObject
 if (($deployment -eq $null)) {
 	Write-Host "Error Deploying the Resources. Check if sufficient permissions exist for the account. Exiting"
 	Exit;
@@ -112,11 +112,11 @@ Write-Host "Successfully created Database.";
 Write-Host "Creating Collection inside the Cosmos Database";
 $containerProperties = @{
     "resource"=@{
-        "id"=$containerName; 
+        "id"=$containerName;
         "partitionKey"=@{
-            "paths"=@("/PartitionKey"); 
+            "paths"=@("/PartitionKey");
             "kind"="Hash"
-        }; 
+        };
         "uniqueKeyPolicy"= @{
             "uniqueKeys"= @(@{
                 "paths"= @(
@@ -126,7 +126,7 @@ $containerProperties = @{
         };
     };
     "options"=@{ "Throughput"= 400 }
-} 
+}
 $collection = New-AzResource -ResourceType "Microsoft.DocumentDb/databaseAccounts/apis/databases/containers" `
     -ApiVersion "2015-04-08" -ResourceGroupName $resourceGroupName `
     -Name $containerResourceName -PropertyObject $containerProperties
