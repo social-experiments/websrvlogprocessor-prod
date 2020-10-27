@@ -4,15 +4,15 @@
     "parameters": {
         "resourceGroupName": {
             "defaultValue": "wslp",
-            "type": "String"
+            "type": "string"
         },
         "databaseAccountName": {
             "defaultValue": "wslpdan",
-            "type": "String"
+            "type": "string"
         },
         "location": {
             "defaultValue": "West US 2",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {
@@ -201,7 +201,7 @@
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~2"
+                            "value": "~3"
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -220,15 +220,15 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2015-08-01",
+                    "apiVersion": "2016-08-01",
                     "name": "web",
-                    "type": "sourcecontrols",
+                    "type": "SourceControls",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites/', variables('functionAppName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "https://github.com/social-experiments/websrvlogprocessor-prod.git",
-                        "branch": "master",
+                        "branch": "sarsoma/dotnet_upgrade",
                         "publishRunbook": true,
                         "IsManualIntegration": true
                     }
